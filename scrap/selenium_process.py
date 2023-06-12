@@ -41,11 +41,11 @@ class Selenium_process:
         i=0
         emails=[]
         for ref in refs:
-            emails += self.get_email_from_url(ref, i)
+            emails += self.get_email_from_url_and_save_in_csv(ref, i)
             i+=1
         return emails
 
-    def get_email_from_url(self, ref, i):
+    def get_email_from_url_and_save_in_csv(self, ref, i):
         email=""
         try:
             self.driver.execute_script("window.open('about:blank', 'tab"+str(i)+"');")
