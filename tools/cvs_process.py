@@ -12,7 +12,8 @@ class Csv_data_access:
                 rows += row
         return rows
 
-    def Write_rows(self, list_of_rows):
-        with open( self.fileDir, 'w') as csvFile:
-            write = csv.writer(csvFile, delimiter=';')
-            write.writerows(list_of_rows)
+    def Write_row(self, row):
+        with open( self.fileDir, 'a') as csvFile:
+            header =['company','emails']
+            dicWriter = csv.DictWriter(csvFile, fieldnames=header, delimiter=';')
+            dicWriter.writerow(row)

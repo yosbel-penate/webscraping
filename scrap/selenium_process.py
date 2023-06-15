@@ -2,7 +2,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-from tools.cvs_process import Csv_data_access
+
 import re
 
 class Selenium_process:
@@ -19,6 +19,11 @@ class Selenium_process:
         options = webdriver.ChromeOptions()
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--ignore-ssl-errors')
+        prefs = {"media.autoplay.enabled" : False,
+                    "profile.managed_default_content_settings.images": 2,
+                    "network.proxy.autoconfig_url.include_path" : True
+                }
+        options.add_experimental_option("prefs", prefs)
         chrome_driver = webdriver.Chrome(options)
         return chrome_driver
 
@@ -55,9 +60,6 @@ class Selenium_process:
             wait.until(EC.url_to_be(ref))
             page_source = self.driver.page_source
             email = list( dict.fromkeys( re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", page_source)))
-            if email:
-                csv_file = Csv_data_access('GFG.csv')
-                csv_file.Write_rows(list(email))
         except Exception as e:
             print("Error open: "+ref+". ")
         return email
