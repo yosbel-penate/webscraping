@@ -5,14 +5,13 @@ url = 'https://www.paginasamarillas.es/search/carpinteria/all-ma/all-pr/all-is/a
 
 selenium_driver = Selenium_process(url)
 
-urls, names = selenium_driver.get_businesses_name_and_url_from_page()
-print(names)
-print(urls)
+company_data = selenium_driver.get_businesses_data_from_yellowpage()
+print(company_data)
 
-emails = selenium_driver.get_emails_from_urls(urls)
-print(emails)
+company_data_and_emails = selenium_driver.get_emails_from_urls(company_data)
+print(company_data_and_emails)
 
-if emails:
+if company_data_and_emails:
     csv_file = Csv_data_access('GFG.csv')
-    for row in emails:
-        csv_file.Write_row({'company': 'none', 'emails': row})
+    for row in company_data_and_emails:
+        csv_file.Write_row({'company': row['name'], 'email': row['email']})
