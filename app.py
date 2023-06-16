@@ -14,4 +14,5 @@ print(company_data_and_emails)
 if company_data_and_emails:
     csv_file = Csv_data_access('GFG.csv')
     for row in company_data_and_emails:
-        csv_file.Write_row({'company': row['name'], 'email': row['email']})
+        if bool(row):
+            csv_file.Write_row(row)

@@ -14,6 +14,6 @@ class Csv_data_access:
 
     def Write_row(self, row):
         with open( self.fileDir, 'a') as csvFile:
-            header =['company','emails']
+            header =['name', 'activity','email', 'province', 'url']
             dicWriter = csv.DictWriter(csvFile, fieldnames=header, delimiter=';')
             dicWriter.writerow(row)
