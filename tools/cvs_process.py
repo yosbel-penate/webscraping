@@ -1,19 +1,19 @@
 import csv
 
-class Csv_data_access:
+class CsvDataAccess:
     def __init__( self, file_dir):
-        self.fileDir = file_dir
+        self.file_dir = file_dir
 
-    def Read_All_Rows(self)->list:
-        rows=[]
-        with open( self.fileDir, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
+    def read_all_rows(self)->list:
+        rows = list
+        with open( self.file_dir, newline='', encoding="utf8") as csv_file:
+            spamreader = csv.reader(csv_file, delimiter=';', quotechar='|')
             for row in spamreader:
                 rows += row
         return rows
 
-    def Write_row(self, row):
-        with open( self.fileDir, 'a') as csvFile:
-            header =['name', 'activity','email', 'province', 'url']
-            dicWriter = csv.DictWriter(csvFile, fieldnames=header, delimiter=';')
-            dicWriter.writerow(row)
+    def write_row(self, row):
+        with open( self.file_dir, 'a', encoding="utf8") as csv_file:
+            header = ['name', 'activity','email', 'province', 'url']
+            dic_writer = csv.DictWriter(csv_file, fieldnames = header, delimiter = ';')
+            dic_writer.writerow(row)
