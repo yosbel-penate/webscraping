@@ -3,6 +3,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 
+import simplejson
 import re
 
 class Selenium_process:
@@ -30,36 +31,46 @@ class Selenium_process:
     def get_element_by(self, by, element):
         return self.driver.find_element(by, element)
 
-    def get_elements_by(self, by, element):
+    def get_elements_by_element(self, by, element):
         return self.driver.find_elements(by, element)
 
-    def get_businesses_url_from_page(self):
-        elements = self.get_elements_by(By.CLASS_NAME, 'web')
-        refs = []
-        for element in elements:
-            ref = element.get_attribute('href')
-            if ref:
-                refs.append(ref)
-        return refs
+    def get_businesses_name_and_url_from_page(self):
+        elements_web = self.get_elements_by_element(By.CLASS_NAME, 'web')
+        urls = []
+        for web in elements_web:
+            url = web.get_attribute('href')
+            ancestor_div = web.find_element(By.XPATH, "ancestor::*[@class='listado-item item-ip']")
+            dictionary = ancestor_div.get_attribute('data-analytics')
+            data_analistic = simplejson.loads(dictionary)
+            company_name = data_analistic.get('name')
+            activity = data_analistic.get('activity')
+            province = data_analistic.get('province')
+            if url:
+                urls.append(url)
+        return urls
 
-    def get_emails_from_urls(self, refs):
+    def get_emails_from_urls(self, urls):
         i=0
         emails=[]
-        for ref in refs:
-            emails += self.get_email_from_url_and_save_in_csv(ref, i)
+        for ref in urls:
+            emails += self.get_email_and_companyName_from_url(ref, i)
             i+=1
         return emails
 
-    def get_email_from_url_and_save_in_csv(self, ref, i):
+    def get_email_and_companyName_from_url(self, url, i):
         email=""
         try:
-            self.driver.execute_script("window.open('about:blank', 'tab"+str(i)+"');")
-            self.driver.switch_to.window("tab"+str(i)+"")
-            wait = WebDriverWait(self.driver, 10)
-            self.driver.get(ref)
-            wait.until(EC.url_to_be(ref))
+            wait = self.open_new_tab(subName = i)
+            self.driver.get(url)
+            wait.until(EC.url_to_be(url))
             page_source = self.driver.page_source
             email = list( dict.fromkeys( re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", page_source)))
         except Exception as e:
-            print("Error open: "+ref+". ")
+            print("Error open: "+url+". ")
         return email
+
+    def open_new_tab(self, subName):
+        self.driver.execute_script("window.open('about:blank', 'tab"+str(subName)+"');")
+        self.driver.switch_to.window("tab"+str(subName)+"")
+        wait = WebDriverWait(self.driver, 10)
+        return wait

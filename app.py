@@ -5,10 +5,11 @@ url = 'https://www.paginasamarillas.es/search/carpinteria/all-ma/all-pr/all-is/a
 
 selenium_driver = Selenium_process(url)
 
-refs = selenium_driver.get_businesses_url_from_page()
-print(refs)
+urls, names = selenium_driver.get_businesses_name_and_url_from_page()
+print(names)
+print(urls)
 
-emails = selenium_driver.get_emails_from_urls(refs)
+emails = selenium_driver.get_emails_from_urls(urls)
 print(emails)
 
 if emails:
