@@ -14,14 +14,11 @@ def get_paginators(URL):
 paginations_list = get_paginators(URL)
 paginations_list[0] = URL
 
-selenium_driver = None
-try:
-    for url in paginations_list:
-        if not selenium_driver:
-            selenium_driver = SeleniumProcess( url)
+for url in paginations_list:
+    try:
+        selenium_driver = SeleniumProcess( url)
         company_data = selenium_driver.get_businesses_data_from_yellowpage()
         company_data_and_emails = selenium_driver.get_emails_from_urls(company_data)
         CsvDataAccess.safe_in_csv(company_data_and_emails)
-finally:
-    selenium_driver.quit_driver()
-
+    finally:
+        selenium_driver.quit_driver()
