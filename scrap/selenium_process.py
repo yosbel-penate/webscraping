@@ -6,10 +6,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from selenium.webdriver.support import expected_conditions as EC
+from tools.cvs_process import CsvDataAccess
+from collections import OrderedDict
 
 class SeleniumProcess:
     def __init__(self, url):
         self.driver = self.__load_chrome_driver(url)
+
+    def quit_driver(self):
+        self.driver.close()
+        self.driver.quit()
 
     def __load_chrome_driver(self, url):
         chrome_driver = self.__set_chrome_options()
@@ -38,21 +44,21 @@ class SeleniumProcess:
                         'notifications': 2,
                         'auto_select_certificate': 2,
                         'fullscreen': 2,
-                        'mouselock': 2,
-                        'mixed_script': 2,
-                        'media_stream': 2,
-                        'media_stream_mic': 2,
+                        #'mouselock': 2,
+                        # 'mixed_script': 2,
+                        # 'media_stream': 2,
+                        # 'media_stream_mic': 2,
                         'media_stream_camera': 2,
-                        'protocol_handlers': 2,
-                        'ppapi_broker': 2,
+                        # 'protocol_handlers': 2,
+                        # 'ppapi_broker': 2,
                         'automatic_downloads': 2,
-                        'midi_sysex': 2,
-                        'push_messaging': 2,
-                        'ssl_cert_decisions': 2,
-                        'metro_switch_to_desktop': 2,
-                        'protected_media_identifier': 2,
+                        # 'midi_sysex': 2,
+                        # 'push_messaging': 2,
+                        # 'ssl_cert_decisions': 2,
+                        # 'metro_switch_to_desktop': 2,
+                        # 'protected_media_identifier': 2,
                         'app_banner': 2,
-                        'site_engagement': 2,
+                        #'site_engagement': 2,**danger**
                         'durable_storage': 2,
                     }
                 }
@@ -73,14 +79,15 @@ class SeleniumProcess:
                 pass
             except WebDriverException:
                 pass
-            company_name, activity,  province = self.get_data_from_company(ancestor_div)
-            if url:
-                data_company.append({
-                    'url': url,
-                    'name': company_name,
-                    'activity': activity,
-                    'province': province
-                })
+            if ancestor_div:
+                company_name, activity,  province = self.get_data_from_company(ancestor_div)
+                if url:
+                    data_company.append({
+                        'url': url,
+                        'name': company_name,
+                        'activity': activity,
+                        'province': province
+                    })
         return data_company
 
     def get_data_from_company(self, ancestor_div: WebElement) -> tuple:
@@ -100,8 +107,8 @@ class SeleniumProcess:
                 data_companys[i] = company
         return data_companys
 
-    def get_email_and_company_name_from_url(self, url, i):
-        email=list
+    def get_email_and_company_name_from_url(self, url, i) -> list:
+        email = []
         try:
             wait = self.open_new_tab(sub_name = i)
             self.driver.get(url)
@@ -114,6 +121,7 @@ class SeleniumProcess:
                 )))
         except Exception as error:
             print("Error open: "+url+". ", error)
+            email = []
         return email
 
     def open_new_tab(self, sub_name:int) -> WebDriverWait:
@@ -121,3 +129,18 @@ class SeleniumProcess:
         self.driver.switch_to.window("tab"+str(sub_name)+"")
         wait = WebDriverWait(self.driver, 10)
         return wait
+
+    def get_paginations(self) -> list:
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        element_paginator = self.driver.find_element(By.CLASS_NAME, 'pagination')
+        items = element_paginator.find_elements(By.TAG_NAME, 'li')
+        urls_pages=[]
+        for item in items:
+            try:
+                url = item.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                urls_pages.append( url)
+            except NoSuchElementException:
+                pass
+        urls_pages = list(OrderedDict.fromkeys(urls_pages))
+        return urls_pages
+

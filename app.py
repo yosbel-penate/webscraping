@@ -3,16 +3,25 @@ from tools.cvs_process import CsvDataAccess
 
 URL = 'https://www.paginasamarillas.es/search/carpinteria/all-ma/all-pr/all-is/all-ci/all-ba/all-pu/all-nc/1?what=carpinteria&qc=true'
 
-selenium_driver = SeleniumProcess(URL)
+def get_paginators(URL):
+    try:
+        driver = SeleniumProcess( URL)
+        pages = driver.get_paginations()
+    finally:
+        driver.quit_driver()
+    return pages
 
-company_data = selenium_driver.get_businesses_data_from_yellowpage()
-print(company_data)
+paginations_list = get_paginators(URL)
+paginations_list[0] = URL
 
-company_data_and_emails = selenium_driver.get_emails_from_urls(company_data)
-print(company_data_and_emails)
+selenium_driver = None
+try:
+    for url in paginations_list:
+        if not selenium_driver:
+            selenium_driver = SeleniumProcess( url)
+        company_data = selenium_driver.get_businesses_data_from_yellowpage()
+        company_data_and_emails = selenium_driver.get_emails_from_urls(company_data)
+        CsvDataAccess.safe_in_csv(company_data_and_emails)
+finally:
+    selenium_driver.quit_driver()
 
-if company_data_and_emails:
-    csv_file = CsvDataAccess('GFG.csv')
-    for row in company_data_and_emails:
-        if bool(row):
-            csv_file.write_row(row)

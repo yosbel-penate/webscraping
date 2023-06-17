@@ -17,3 +17,11 @@ class CsvDataAccess:
             header = ['name', 'activity','email', 'province', 'url']
             dic_writer = csv.DictWriter(csv_file, fieldnames = header, delimiter = ';')
             dic_writer.writerow(row)
+
+    @staticmethod
+    def safe_in_csv( company_data_and_emails):
+        if company_data_and_emails:
+            csv_file = CsvDataAccess('GFG.csv')
+            for row in company_data_and_emails:
+                if bool(row) and row['email'] != []:
+                    csv_file.write_row(row)
