@@ -16,6 +16,8 @@ paginations_list[0] = URL
 
 for url in paginations_list:
     try:
+        company_data=[]
+        company_data_and_emails=[]
         selenium_driver = SeleniumProcess( url)
         company_data = selenium_driver.get_businesses_data_from_yellowpage()
         company_data_and_emails = selenium_driver.get_emails_from_urls(company_data)
